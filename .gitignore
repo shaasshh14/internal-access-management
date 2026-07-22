@@ -81,3 +81,14 @@ test-results/
 .pnpm-store/
 .npm/
 .yarn/
+
+# ----------------------------
+# Tailwind CSS
+# ----------------------------
+tailwind.config.ts
+postcss.config.ts
+
+# ----------------------------
+# Shadcn/ui
+# ----------------------------
+components.json
