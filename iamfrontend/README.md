@@ -1,75 +1,200 @@
-# React + TypeScript + Vite
+# IAM Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Frontend application for the Internal Access Management (IAM) platform.
 
-Currently, two official plugins are available:
+Built using React, TypeScript, Vite, and Tailwind CSS following enterprise frontend architecture.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+---
 
-## React Compiler
+## Tech Stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- React 19
+- TypeScript
+- Vite
+- Tailwind CSS v4
+- React Router
+- TanStack Query
+- Axios
+- React Hook Form
+- Zod
+- Lucide React
+- Recharts
 
-## Expanding the ESLint configuration
+---
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## Folder Structure
 
 ```
+src/
+│
+├── app/
+│   ├── config/
+│   ├── providers/
+│   ├── routes/
+│   └── store/
+│
+├── assets/
+│
+├── features/
+│   ├── auth/
+│   ├── dashboard/
+│   ├── access/
+│   ├── requests/
+│   ├── approvals/
+│   ├── users/
+│   ├── roles/
+│   ├── reports/
+│   ├── audit/
+│   ├── monitoring/
+│   ├── notifications/
+│   ├── policies/
+│   ├── workflow/
+│   └── settings/
+│
+├── layouts/
+│
+├── shared/
+│   ├── components/
+│   ├── constants/
+│   ├── hooks/
+│   ├── services/
+│   ├── types/
+│   ├── utils/
+│   └── validators/
+│
+├── styles/
+├── theme/
+├── lib/
+└── main.tsx
+```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+---
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## Application Structure
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```
+Login
+    │
+Dashboard Layout
+    │
+├── Sidebar
+├── Navbar
+└── Page Content
+```
 
+The layout is shared across all authenticated pages using nested routing with `Outlet`.
+
+---
+
+## Libraries
+
+| Library            | Purpose                           |
+| ------------------ | --------------------------------- |
+| React Router       | Client-side routing               |
+| Axios              | HTTP client                       |
+| TanStack Query     | API caching and server state      |
+| React Hook Form    | Form state management             |
+| Zod                | Validation                        |
+| Hookform Resolvers | Connects Zod with React Hook Form |
+| Lucide React       | Icons                             |
+| Recharts           | Dashboard charts                  |
+| clsx               | Conditional class names           |
+| tailwind-merge     | Tailwind class merging            |
+
+---
+
+## Current Features
+
+- Enterprise Folder Structure
+- React Router Configuration
+- Nested Routing
+- Dashboard Layout
+- Sidebar
+- Navbar
+- Shared Component Architecture
+
+---
+
+## Upcoming Features
+
+### Authentication
+
+- Login
+- JWT Integration
+- Protected Routes
+
+### Dashboard
+
+- Statistics Cards
+- Charts
+- Recent Activity
+- Notifications
+
+### Access Management
+
+- Request Access
+- My Access
+- Approval Workflow
+
+### Administration
+
+- Users
+- Roles
+- Applications
+- Policies
+
+### Reports
+
+- Audit Logs
+- Analytics
+- Export Reports
+
+---
+
+## Development
+
+Install dependencies
+
+```bash
+npm install
+```
+
+Run development server
+
+```bash
+npm run dev
+```
+
+Build production
+
+```bash
+npm run build
+```
+
+---
+
+## Frontend Principles
+
+- Feature-first architecture
+- Reusable UI components
+- Type-safe development
+- Component composition
+- Responsive design
+- Clean separation of concerns
+- Enterprise scalability
+
+---
+
+## Status
+
+Current Version
+
+```
+v0.1.0
+```
+
+Development Stage
+
+```
+Project Setup & Architecture
 ```
