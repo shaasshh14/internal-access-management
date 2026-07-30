@@ -14,17 +14,24 @@ export default function LoginPage() {
     } = useForm<LoginRequest>({
         resolver: zodResolver(loginSchema),
     });
-    
-    const onSubmit = async (data: LoginRequest) => {
-        try {
-            const response = await login(data);
-            console.log(response);
-        } catch (error) {
-            console.error(error);
-        }
-    };
 
     const [isLoading, setIsLoading] = useState(false);
+
+    const onSubmit = async (data: LoginRequest) => {
+        try {
+            setIsLoading(true);
+
+            const response = await login(data);
+
+            console.log(response);
+        } 
+        catch (error) {
+            console.error(error);
+        } 
+        finally {
+            setIsLoading(false);
+        }
+    };
 
     return (
         <div className="flex min-h-screen items-center justify-center bg-slate-700">
