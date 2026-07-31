@@ -1,10 +1,11 @@
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+
 import { login } from "../services/authService";
-import { useState } from "react";
+import { loginSchema } from "../validation/loginSchema";
 
 import type { LoginRequest } from "../../../shared/types/auth";
-import { loginSchema } from "../validation/loginSchema";
 
 export default function LoginPage() {
     const {
@@ -20,22 +21,18 @@ export default function LoginPage() {
     const onSubmit = async (data: LoginRequest) => {
         try {
             setIsLoading(true);
-
-            const response = await login(data);
-
-            console.log(response);
-        } 
-        catch (error) {
+            const user = await login(data);
+            console.log(user);
+        } catch (error) {
             console.error(error);
-        } 
-        finally {
+        } finally {
             setIsLoading(false);
         }
     };
 
     return (
         <div className="flex min-h-screen items-center justify-center bg-slate-700">
-            <form 
+            <form
                 onSubmit={handleSubmit(onSubmit)}
                 className="w-full max-w-md rounded-xl bg-white p-8 shadow-lg"
             >
@@ -48,7 +45,7 @@ export default function LoginPage() {
                         Email
                     </label>
 
-                    <input 
+                    <input
                         type="email"
                         {...register("email")}
                         className="w-full rounded-lg border p-3"
@@ -61,11 +58,29 @@ export default function LoginPage() {
                     )}
                 </div>
 
+                <div className="mb-6">
+                    <label className="mb-2 block font-medium">
+                        Password
+                    </label>
+
+                    <input
+                        type="password"
+                        {...register("password")}
+                        className="w-full rounded-lg border p-3"
+                    />
+
+                    {errors.password && (
+                        <p className="mt-1 text-sm text-red-600">
+                            {errors.password.message}
+                        </p>
+                    )}
+                </div>
+
                 <button
                     type="submit"
                     disabled={isLoading}
                     className="w-full rounded-lg bg-blue-600 py-3 text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
-                    >
+                >
                     {isLoading ? "Logging in..." : "Login"}
                 </button>
             </form>
