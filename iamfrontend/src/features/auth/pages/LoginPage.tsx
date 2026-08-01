@@ -5,7 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { login } from "../services/authService";
 import { loginSchema } from "../validation/loginSchema";
 
-import type { LoginRequest } from "../../../shared/types/auth";
+import type { LoginRequest } from "../types/auth";
 
 export default function LoginPage() {
     const {
