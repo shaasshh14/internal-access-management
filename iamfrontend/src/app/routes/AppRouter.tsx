@@ -12,10 +12,7 @@ import UsersPage from "../../features/dashboard/pages/UsersPage";
 import RequestPage from "../../features/dashboard/pages/RequestsPage";
 import AuditPage from "../../features/dashboard/pages/AuditPage";
 import SettingsPage from "../../features/dashboard/pages/SettingsPage";
-
-function LoginPage() {
-  return <h1>Login</h1>;
-}
+import LoginPage from "../../features/auth/pages/LoginPage";
 
 export default function AppRouter() {
   return (

@@ -3,7 +3,7 @@ import api from "../../../shared/services/api";
 import type {
     LoginRequest,
     LoginResponse,
-} from "../../../shared/types/auth";
+} from "../types/auth";
 
 export async function login (
     data: LoginRequest
