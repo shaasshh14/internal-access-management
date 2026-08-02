@@ -6,6 +6,8 @@ import { login } from "../services/authService";
 import { loginSchema } from "../validation/loginSchema";
 
 import type { LoginRequest } from "../types/auth";
+import Input from "../../../shared/components/Input/Input";
+import PasswordInput from "../../../shared/components/PasswordInput/PasswordInput";
 
 export default function LoginPage() {
     const {
@@ -40,41 +42,20 @@ export default function LoginPage() {
                     Login
                 </h1>
 
-                <div className="mb-4">
-                    <label className="mb-2 block font-medium">
-                        Email
-                    </label>
+                <Input 
+                    label="Email"
+                    type="Email"
+                    placeholder="Enter your Email"
+                    registration={register("email")}
+                    error={errors.email?.message}
+                />
 
-                    <input
-                        type="email"
-                        {...register("email")}
-                        className="w-full rounded-lg border p-3"
-                    />
-
-                    {errors.email && (
-                        <p className="mt-1 text-sm text-red-600">
-                            {errors.email.message}
-                        </p>
-                    )}
-                </div>
-
-                <div className="mb-6">
-                    <label className="mb-2 block font-medium">
-                        Password
-                    </label>
-
-                    <input
-                        type="password"
-                        {...register("password")}
-                        className="w-full rounded-lg border p-3"
-                    />
-
-                    {errors.password && (
-                        <p className="mt-1 text-sm text-red-600">
-                            {errors.password.message}
-                        </p>
-                    )}
-                </div>
+                <PasswordInput 
+                    label="Password"
+                    placeholder="Enter your password"
+                    registration={register("password")}
+                    error={errors.password?.message}
+                />
 
                 <button
                     type="submit"

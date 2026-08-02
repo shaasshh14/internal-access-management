@@ -1,4 +1,4 @@
-export default function RequestPage() {
+export default function RequestsPage() {
   return (
     <div>
       <h1 className="text-3xl font-bold">
