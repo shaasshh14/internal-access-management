@@ -8,6 +8,7 @@ import { loginSchema } from "../validation/loginSchema";
 import type { LoginRequest } from "../types/auth";
 import Input from "../../../shared/components/Input/Input";
 import PasswordInput from "../../../shared/components/PasswordInput/PasswordInput";
+import Checkbox from "../../../shared/components/Checkbox/Checkbox";
 
 export default function LoginPage() {
     const {
@@ -56,6 +57,19 @@ export default function LoginPage() {
                     registration={register("password")}
                     error={errors.password?.message}
                 />
+
+                <div className="mb-6 flex items-center justify-between">
+                    <Checkbox
+                        label="Remember Me"
+                    />
+
+                    <button
+                        type="button"
+                        className="text-sm text-blue-600 hover:underline"
+                    >
+                        Forgot Password?
+                    </button>
+                </div>
 
                 <button
                     type="submit"
