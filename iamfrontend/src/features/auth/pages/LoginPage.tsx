@@ -10,6 +10,8 @@ import Input from "../../../shared/components/Input/Input";
 import PasswordInput from "../../../shared/components/PasswordInput/PasswordInput";
 import Checkbox from "../../../shared/components/Checkbox/Checkbox";
 
+import Logo from "../../../shared/components/Logo/Logo";
+
 export default function LoginPage() {
     const {
         register,
@@ -20,14 +22,16 @@ export default function LoginPage() {
     });
 
     const [isLoading, setIsLoading] = useState(false);
+    const [errorMessage, setErrorMessage] = useState("");
 
     const onSubmit = async (data: LoginRequest) => {
+        setErrorMessage("");
         try {
             setIsLoading(true);
             const user = await login(data);
             console.log(user);
         } catch (error) {
-            console.error(error);
+            setErrorMessage("Invalid email or password.");
         } finally {
             setIsLoading(false);
         }
@@ -39,9 +43,16 @@ export default function LoginPage() {
                 onSubmit={handleSubmit(onSubmit)}
                 className="w-full max-w-md rounded-xl bg-white p-8 shadow-lg"
             >
-                <h1 className="mb-6 text-3xl font-bold">
-                    Login
+                <div className="mb-5 flex justify-center">
+                    <Logo/>
+                </div>
+                <h1 className="text-center text-3xl font-bold">
+                    Welcome Back
                 </h1>
+
+                <p className="mb-6 text-center text-slate-500">
+                    Sign in to Internal Access Management Portal
+                </p>
 
                 <Input 
                     label="Email"
@@ -78,6 +89,13 @@ export default function LoginPage() {
                 >
                     {isLoading ? "Logging in..." : "Login"}
                 </button>
+
+                {errorMessage && (
+                    <div className="mt-4 rounded-lg bg-red-100 p-3 text-sm text-red-700">
+                        {errorMessage}
+                    </div>
+                )}
+
             </form>
         </div>
     );
