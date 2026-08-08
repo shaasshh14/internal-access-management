@@ -4,6 +4,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 
 import { login } from "../services/authService";
 import { loginSchema } from "../validation/loginSchema";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../../contexts/AuthContext";
 
 import type { LoginRequest } from "../types/auth";
 import Input from "../../../shared/components/Input/Input";
@@ -23,6 +25,8 @@ export default function LoginPage() {
 
     const [isLoading, setIsLoading] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
+    const { login: setIsAuthenticated } = useAuth();
+    const navigate = useNavigate();
 
     const onSubmit = async (data: LoginRequest) => {
         setErrorMessage("");
@@ -30,6 +34,9 @@ export default function LoginPage() {
             setIsLoading(true);
             const user = await login(data);
             console.log(user);
+
+            setIsAuthenticated();
+            navigate("/dashboard");
         } catch (error) {
             setErrorMessage("Invalid email or password.");
         } finally {
