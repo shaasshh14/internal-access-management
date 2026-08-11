@@ -13,7 +13,7 @@ import RequestPage from "../../features/requests/pages/RequestsPage";
 import AuditPage from "../../features/audit/pages/AuditPage";
 import SettingsPage from "../../features/settings/pages/SettingsPage";
 import LoginPage from "../../features/auth/pages/LoginPage";
-import ProtectedRoute from "../routes/ProtectedRoutes";
+import ProtectedRoute from "./ProtectedRoute";
 
 export default function AppRouter() {
   return (
