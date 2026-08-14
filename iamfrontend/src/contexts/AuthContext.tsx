@@ -2,11 +2,14 @@ import {
     createContext,
     useContext,
     useState,
+    useEffect,
     type ReactNode,
 } from 'react';
+import { getCurrentUser } from '../features/auth/services/authSessionService';
 
 interface AuthContextType {
     isAuthenticated: boolean;
+    isLoading: boolean;
     login: () => void;
     logout: () => void;
 }
@@ -21,6 +24,22 @@ export function AuthProvider({
     children: ReactNode;
 }) {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        async function checkAuthentication() {
+            try {
+                await getCurrentUser();
+                setIsAuthenticated(true);
+            } catch {
+                setIsAuthenticated(false);
+            } finally {
+                setIsLoading(false);
+            }
+        }
+
+        checkAuthentication();
+    }, []);
 
     function login() {
         setIsAuthenticated(true);
@@ -34,6 +53,7 @@ export function AuthProvider({
         <AuthContext.Provider
             value={{
                 isAuthenticated,
+                isLoading,
                 login,
                 logout,
             }}

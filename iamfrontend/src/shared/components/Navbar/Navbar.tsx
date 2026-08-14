@@ -1,6 +1,16 @@
 import {Bell, Search, CircleUserRound} from "lucide-react";
+import { replace, useNavigate } from "react-router-dom";
+import { useAuth } from "../../../contexts/AuthContext";
 
 export default function Navbar () {
+    const { logout } = useAuth();
+    const navigate = useNavigate();
+
+    const handleLogout = () => {
+        logout();
+        navigate("/login", {replace: true});
+    };
+
     return (
         <header className="h-16 border-b bg-white flex items-center justify-between px-6">
 
@@ -14,7 +24,16 @@ export default function Navbar () {
 
                 <Bell className="cursor-pointer" />
 
-                <CircleUserRound size={32} />
+                <div className="flex items-center gap-3">
+                    <CircleUserRound size={32} />
+
+                    <button
+                        onClick={handleLogout}
+                        className="rounded-lg px-3 py-2 text-sm text-red-600 hover:bg-red-50"
+                    >
+                        Logout
+                    </button>
+                </div>
                 
             </div>
 
