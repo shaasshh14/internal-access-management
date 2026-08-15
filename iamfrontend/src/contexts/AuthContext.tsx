@@ -7,12 +7,11 @@ import {
 } from 'react';
 import { getCurrentUser } from '../features/auth/services/authSessionService';
 import { logout as logoutRequest } from "../features/auth/services/authService";
-
 interface AuthContextType {
     isAuthenticated: boolean;
     isLoading: boolean;
     login: () => void;
-    logout: () => void;
+    logout: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(
@@ -46,8 +45,12 @@ export function AuthProvider({
         setIsAuthenticated(true);
     }
 
-    function logout() {
-        setIsAuthenticated(false);
+    async function logout() {
+        try {
+            await logoutRequest();
+        } finally {
+            setIsAuthenticated(false);
+        }
     }
 
     return (
