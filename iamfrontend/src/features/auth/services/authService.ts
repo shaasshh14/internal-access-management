@@ -12,6 +12,9 @@ export async function login (
         "/auth/login",
         data
     );
-
     return response.data;
+}
+
+export async function logout() {
+    await api.post("/auth/logout");
 }
