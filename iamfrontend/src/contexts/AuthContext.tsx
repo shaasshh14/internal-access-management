@@ -7,6 +7,8 @@ import {
 } from 'react';
 import { getCurrentUser } from '../features/auth/services/authSessionService';
 import { logout as logoutRequest } from "../features/auth/services/authService";
+
+
 interface AuthContextType {
     isAuthenticated: boolean;
     isLoading: boolean;
