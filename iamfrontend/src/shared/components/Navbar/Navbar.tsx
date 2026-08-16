@@ -6,9 +6,9 @@ export default function Navbar () {
     const { logout } = useAuth();
     const navigate = useNavigate();
 
-    const handleLogout = () => {
-        logout();
-        navigate("/login", {replace: true});
+    const handleLogout = async () => {
+        await logout();
+        navigate("/login", { replace: true });
     };
 
     return (
