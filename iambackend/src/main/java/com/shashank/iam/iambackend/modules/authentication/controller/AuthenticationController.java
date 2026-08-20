@@ -9,6 +9,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
+import com.shashank.iam.iambackend.security.jwt.JwtService;
 
 @RestController
 @RequestMapping("/auth")
@@ -16,6 +17,7 @@ import jakarta.validation.Valid;
 public class AuthenticationController {
 
     private final AuthenticationManager authenticationManager;
+    private final JwtService jwtService;
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(
@@ -28,7 +30,9 @@ public class AuthenticationController {
 
         return ResponseEntity.ok(
                 LoginResponse.builder()
-                        .accessToken("TEMP_TOKEN")
+                        .accessToken(
+                                jwtService.generateAccessToken(
+                                        request.getEmail()))
                         .build());
     }
 }
