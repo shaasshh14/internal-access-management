@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
 import com.shashank.iam.iambackend.security.jwt.JwtService;
+import org.springframework.security.core.Authentication;
 
 @RestController
 @RequestMapping("/auth")
@@ -22,7 +23,6 @@ public class AuthenticationController {
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(
             @Valid @RequestBody LoginRequest request) {
-
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         request.getEmail(),
@@ -34,5 +34,11 @@ public class AuthenticationController {
                                 jwtService.generateAccessToken(
                                         request.getEmail()))
                         .build());
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<String> getCurrentUser(
+            Authentication authentication) {
+        return ResponseEntity.ok(authentication.getName());
     }
 }
