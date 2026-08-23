@@ -1,18 +1,9 @@
-# ----------------------------
-# Dependencies
-# ----------------------------
 node_modules/
 
-# ----------------------------
-# Build Output
-# ----------------------------
 dist/
 build/
 coverage/
 
-# ----------------------------
-# Logs
-# ----------------------------
 logs/
 *.log
 npm-debug.log*
@@ -20,16 +11,10 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
-# ----------------------------
-# Environment Variables
-# ----------------------------
 .env
 .env.*
 !.env.example
 
-# ----------------------------
-# IDE
-# ----------------------------
 .vscode/*
 !.vscode/extensions.json
 !.vscode/settings.json
@@ -39,56 +24,32 @@ pnpm-debug.log*
 .idea/
 *.iml
 
-# ----------------------------
-# OS Files
-# ----------------------------
 .DS_Store
 Thumbs.db
 Desktop.ini
 
-# ----------------------------
-# Cache
-# ----------------------------
 .cache/
 .parcel-cache/
 .eslintcache
 .stylelintcache
 *.tsbuildinfo
 
-# ----------------------------
-# Vite
-# ----------------------------
 vite.config.ts.timestamp-*
 
-# ----------------------------
-# Temporary Files
-# ----------------------------
 *.tmp
 *.temp
 *.swp
 *.swo
 *.bak
 
-# ----------------------------
-# Testing
-# ----------------------------
 playwright-report/
 test-results/
 
-# ----------------------------
-# Package Managers
-# ----------------------------
 .pnpm-store/
 .npm/
 .yarn/
 
-# ----------------------------
-# Tailwind CSS
-# ----------------------------
 tailwind.config.ts
 postcss.config.ts
 
-# ----------------------------
-# Shadcn/ui
-# ----------------------------
 components.json
