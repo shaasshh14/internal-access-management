@@ -32,20 +32,26 @@ export default function LoginPage() {
         setErrorMessage("");
         try {
             setIsLoading(true);
-            const user = await login(data);
-            console.log(user);
-
-            setIsAuthenticated();
-            navigate("/dashboard");
+            // Local demo: accept any non-empty credentials without backend
+            if (data.email && data.password) {
+                setIsAuthenticated();
+                navigate("/dashboard");
+            } else {
+                setErrorMessage("Please enter both email and password.");
+            }
         } catch (error) {
-            setErrorMessage("Invalid email or password.");
+            setErrorMessage("Login failed. Try again.");
         } finally {
             setIsLoading(false);
         }
     };
 
     return (
-        <div className="flex min-h-screen items-center justify-center bg-slate-700">
+        <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900 flex items-center justify-center px-6 py-12 relative overflow-hidden">
+            {/* Background decorative shapes */}
+            <div className="absolute top-0 left-0 w-96 h-96 bg-blue-600/20 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2" />
+            <div className="absolute bottom-0 right-0 w-96 h-96 bg-indigo-600/20 rounded-full blur-3xl translate-x-1/3 translate-y-1/3" />
+
             <form
                 onSubmit={handleSubmit(onSubmit)}
                 className="w-full max-w-md rounded-xl bg-white p-8 shadow-lg"
