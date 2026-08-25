@@ -1,62 +1,28 @@
-import Badge from "../Badge/Badge";
+import { VariantProps } from "class-variance-authority";
 
-interface StatusBadgeProps {
-  status: string;
-  className?: string;
+import { cn } from "@/lib/utils";
+
+const badgeVariants = (variant: "neutral" | "success" | "warning" | "danger") =>
+    cn(
+        "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium",
+        {
+            neutral: "text-slate-500 bg-slate-100",
+            success: "text-success-800 bg-success-50 border border-success-100",
+            warning: "text-warning-800 bg-warning-50 border border-warning-100",
+            danger: "text-danger-800 bg-danger-50 border border-danger-100",
+        }
+    );
+
+export interface StatusBadgeProps {
+    status: string;
+    variant?: "neutral" | "success" | "warning" | "danger";
+    className?: string;
 }
 
-export default function StatusBadge({ status, className }: StatusBadgeProps) {
-  const normStatus = status.toUpperCase();
-
-  let variant: "neutral" | "primary" | "success" | "warning" | "error" | "info" = "neutral";
-  let label = status;
-
-  switch (normStatus) {
-    case "ACTIVE":
-    case "APPROVED":
-    case "SUCCESS":
-      variant = "success";
-      label = normStatus === "ACTIVE" ? "Active" : normStatus === "APPROVED" ? "Approved" : "Success";
-      break;
-    case "PENDING":
-    case "MAINTENANCE":
-      variant = "warning";
-      label = normStatus === "PENDING" ? "Pending" : "Maintenance";
-      break;
-    case "INACTIVE":
-    case "SUSPENDED":
-    case "REJECTED":
-    case "REVOKED":
-    case "FAILURE":
-    case "EXPIRED":
-      variant = "error";
-      label =
-        normStatus === "INACTIVE"
-          ? "Inactive"
-          : normStatus === "SUSPENDED"
-          ? "Suspended"
-          : normStatus === "REJECTED"
-          ? "Rejected"
-          : normStatus === "REVOKED"
-          ? "Revoked"
-          : normStatus === "EXPIRED"
-          ? "Expired"
-          : "Failure";
-      break;
-    case "STAGING":
-    case "DEVELOPMENT":
-      variant = "info";
-      label = normStatus === "STAGING" ? "Staging" : "Development";
-      break;
-    case "PRODUCTION":
-      variant = "primary";
-      label = "Production";
-      break;
-  }
-
-  return (
-    <Badge variant={variant} className={className}>
-      {label}
-    </Badge>
-  );
+export function StatusBadge({ status, variant = "neutral", className }: StatusBadgeProps) {
+    return (
+        <span className={cn(badgeVariants(variant), className)}>{status}</span>
+    );
 }
+
+export default StatusBadge;
