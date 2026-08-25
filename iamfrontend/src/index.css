@@ -1,1 +1,278 @@
 @import "tailwindcss";
+
+@theme {
+    --color-success-50: #F0FDF4;
+    --color-success-100: #DCFCE7;
+    --color-success-200: #BBF7D0;
+    --color-success-300: #86EFAC;
+    --color-success-400: #4ADE80;
+    --color-success-500: #22C55E;
+    --color-success-600: #16A34A;
+    --color-success-700: #15803D;
+    --color-success-800: #166534;
+    --color-success-900: #14532D;
+
+    --color-warning-50: #FFFBEB;
+    --color-warning-100: #FEF3C7;
+    --color-warning-200: #FDE68A;
+    --color-warning-300: #FCD34D;
+    --color-warning-400: #FBBF24;
+    --color-warning-500: #F59E0B;
+    --color-warning-600: #D97706;
+    --color-warning-700: #B45309;
+    --color-warning-800: #92400E;
+    --color-warning-900: #78350F;
+
+    --color-danger-50: #FEF2F2;
+    --color-danger-100: #FEE2E2;
+    --color-danger-200: #FECACA;
+    --color-danger-300: #FCA5A5;
+    --color-danger-400: #F87171;
+    --color-danger-500: #EF4444;
+    --color-danger-600: #DC2626;
+    --color-danger-700: #B91C1C;
+    --color-danger-800: #991B1B;
+    --color-danger-900: #7F1D1D;
+
+    --color-info-50: #F0F9FF;
+    --color-info-100: #E0F2FE;
+    --color-info-200: #BAE6FD;
+    --color-info-300: #7DD3FC;
+    --color-info-400: #38BDF8;
+    --color-info-500: #0EA5E9;
+    --color-info-600: #0284C7;
+    --color-info-700: #0369A1;
+    --color-info-800: #075985;
+    --color-info-900: #0C4A6E;
+}
+
+/* ────────── Enterprise Design Foundation ────────── */
+@layer base {
+    :root {
+        --color-canvas: #F5F7FA;
+        --color-surface: #FFFFFF;
+        --color-surface-muted: #F8FAFC;
+        --color-border: #E4E7EC;
+        --color-border-subtle: #EEF1F4;
+        --color-text-primary: #0F172A;
+        --color-text-secondary: #475569;
+        --color-text-tertiary: #94A3B8;
+        --color-text-muted: #64748B;
+
+        --shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.04);
+        --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.05), 0 1px 2px rgba(15, 23, 42, 0.04);
+        --shadow-md: 0 4px 12px rgba(15, 23, 42, 0.06), 0 1px 3px rgba(15, 23, 42, 0.04);
+        --shadow-lg: 0 12px 32px rgba(15, 23, 42, 0.08), 0 2px 6px rgba(15, 23, 42, 0.04);
+
+        --radius-sm: 4px;
+        --radius-md: 6px;
+        --radius-lg: 8px;
+    }
+
+    html, body, #root {
+        height: 100%;
+    }
+
+    body {
+        font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        text-rendering: optimizeLegibility;
+        color: var(--color-text-primary);
+        background-color: var(--color-canvas);
+        font-feature-settings: "cv02", "cv03", "cv04", "cv11", "ss01";
+    }
+
+    /* Subtle scrollbar styling */
+    *::-webkit-scrollbar {
+        width: 10px;
+        height: 10px;
+    }
+    *::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    *::-webkit-scrollbar-thumb {
+        background: #CBD5E1;
+        border-radius: 5px;
+        border: 2px solid transparent;
+        background-clip: content-box;
+    }
+    *::-webkit-scrollbar-thumb:hover {
+        background: #94A3B8;
+        background-clip: content-box;
+        border: 2px solid transparent;
+    }
+}
+
+/* ────────── Component Utilities ────────── */
+@layer components {
+    .card-elevated {
+        background: var(--color-surface);
+        border: 1px solid var(--color-border);
+        border-radius: 8px;
+        box-shadow: var(--shadow-xs);
+    }
+
+    .card-flat {
+        background: var(--color-surface);
+        border: 1px solid var(--color-border-subtle);
+        border-radius: 8px;
+    }
+
+    .input-base {
+        width: 100%;
+        background: #FFFFFF;
+        border: 1px solid var(--color-border);
+        border-radius: 6px;
+        padding: 0.5rem 0.75rem;
+        font-size: 0.875rem;
+        color: var(--color-text-primary);
+        transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .input-base:focus {
+        outline: none;
+        border-color: #2563EB;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+    }
+    .input-base::placeholder {
+        color: #94A3B8;
+    }
+    .input-base:disabled {
+        background: #F8FAFC;
+        color: #94A3B8;
+        cursor: not-allowed;
+    }
+
+    .btn-primary {
+        background: #2563EB;
+        color: #FFFFFF;
+        font-weight: 500;
+        font-size: 0.875rem;
+        border-radius: 6px;
+        padding: 0.5rem 0.875rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: background-color 0.15s, transform 0.05s;
+        box-shadow: 0 1px 2px rgba(37, 99, 235, 0.18);
+    }
+    .btn-primary:hover { background: #1D4ED8; }
+    .btn-primary:active { transform: translateY(1px); }
+    .btn-primary:disabled { background: #94A3B8; cursor: not-allowed; }
+
+    .btn-secondary {
+        background: #FFFFFF;
+        color: #1E293B;
+        font-weight: 500;
+        font-size: 0.875rem;
+        border: 1px solid var(--color-border);
+        border-radius: 6px;
+        padding: 0.5rem 0.875rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: background-color 0.15s, border-color 0.15s;
+    }
+    .btn-secondary:hover { background: #F8FAFC; border-color: #CBD5E1; }
+    .btn-secondary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .btn-ghost {
+        color: #475569;
+        font-weight: 500;
+        font-size: 0.875rem;
+        padding: 0.5rem 0.75rem;
+        border-radius: 6px;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: background-color 0.15s, color 0.15s;
+    }
+    .btn-ghost:hover { background: #F1F5F9; color: #0F172A; }
+
+    .btn-danger {
+        background: #DC2626;
+        color: #FFFFFF;
+        font-weight: 500;
+        font-size: 0.875rem;
+        border-radius: 6px;
+        padding: 0.5rem 0.875rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: background-color 0.15s;
+    }
+    .btn-danger:hover { background: #B91C1C; }
+    .btn-danger:disabled { background: #94A3B8; cursor: not-allowed; }
+
+    .nav-item {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.5rem 0.75rem;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: #94A3B8;
+        border-radius: 6px;
+        transition: background-color 0.12s, color 0.12s;
+        position: relative;
+    }
+    .nav-item:hover {
+        background: rgba(255, 255, 255, 0.04);
+        color: #E2E8F0;
+    }
+    .nav-item-active {
+        color: #FFFFFF;
+        background: rgba(37, 99, 235, 0.12);
+    }
+    .nav-item-active::before {
+        content: "";
+        position: absolute;
+        left: -12px;
+        top: 6px;
+        bottom: 6px;
+        width: 3px;
+        background: #2563EB;
+        border-radius: 0 3px 3px 0;
+    }
+
+    /* Skeleton shimmer */
+    .shimmer {
+        background: linear-gradient(
+            90deg,
+            rgba(241, 245, 249, 0.6) 0%,
+            rgba(226, 232, 240, 0.6) 50%,
+            rgba(241, 245, 249, 0.6) 100%
+        );
+        background-size: 200% 100%;
+        animation: shimmer 1.4s ease-in-out infinite;
+    }
+    @keyframes shimmer {
+        0% { background-position: 200% 0; }
+        100% { background-position: -200% 0; }
+    }
+
+    /* Fade-in entry */
+    .fade-in {
+        animation: fadeIn 0.2s ease-out;
+    }
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(2px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .slide-in-right {
+        animation: slideInRight 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes slideInRight {
+        from { transform: translateX(8px); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+    }
+
+    .scale-in {
+        animation: scaleIn 0.18s ease-out;
+    }
+    @keyframes scaleIn {
+        from { transform: scale(0.96); opacity: 0; }
+        to { transform: scale(1); opacity: 1; }
+    }
+}
