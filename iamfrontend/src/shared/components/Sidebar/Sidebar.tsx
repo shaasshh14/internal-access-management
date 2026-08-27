@@ -135,7 +135,7 @@ export default function Sidebar({ isOpen = false, onClose }: SidebarProps) {
         </div>
         <div className="mt-2 px-1 flex items-center gap-1.5 text-[10px] text-slate-600">
           <HelpCircle size={10} />
-          <span>v2.4.1 · Sentinel IAM</span>
+          <span>v2.4.1 · Encore IAM</span>
         </div>
       </div>
     </>
