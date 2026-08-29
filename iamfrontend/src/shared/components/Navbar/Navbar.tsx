@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
-import { Search, Bell, Menu, ChevronDown } from "lucide-react";
+import { useCommandPalette } from "@/shared/components/CommandPalette/CommandPaletteContext";
+import { Search, Bell, Menu, ChevronDown, Command } from "lucide-react";
 
 interface NavbarProps {
   onMenuClick?: () => void;
@@ -12,6 +13,7 @@ export default function Navbar({ onMenuClick }: NavbarProps) {
   const navigate = useNavigate();
   const location = useLocation();
   const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const { open: openCommandPalette } = useCommandPalette();
 
   const pathSegments = location.pathname.split("/").filter(Boolean);
   const breadcrumbLabel = pathSegments.length > 0
@@ -35,10 +37,14 @@ export default function Navbar({ onMenuClick }: NavbarProps) {
 
       <div className="flex items-center gap-1 sm:gap-4">
         <button
-          className="p-2 rounded-lg hover:bg-slate-50 transition text-slate-600"
-          aria-label="Search"
+          onClick={openCommandPalette}
+          className="p-2 rounded-lg hover:bg-slate-50 transition text-slate-600 relative group"
+          aria-label="Open command palette"
         >
           <Search size={20} />
+          <kbd className="absolute -top-0.5 -right-0.5 flex h-4 min-w-[16px] items-center justify-center rounded-[3px] bg-slate-100 border border-slate-200 px-0.5 text-[8px] font-semibold text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity">
+            <Command size={7} />K
+          </kbd>
         </button>
 
         <button
