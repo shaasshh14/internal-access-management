@@ -3,14 +3,16 @@ import { Link } from "react-router-dom";
 import {
   Users, Shield, AppWindow, ClipboardList,
   CheckCircle, XCircle, AlertTriangle, Plus, Search,
-  ArrowRight, Activity, TrendingUp
+  ArrowRight, Activity, TrendingUp, Clock, UserX, ShieldAlert
 } from "lucide-react";
 import LoadingState from "@/shared/components/LoadingState/LoadingState";
 import StatusBadge from "@/shared/components/StatusBadge/StatusBadge";
 import { dashboardService } from "@/shared/services/dashboardService";
 import { requestService } from "@/shared/services/requestService";
 import { auditService } from "@/shared/services/auditService";
-import type { DashboardStats, AccessRequest, AuditLog } from "@/types";
+import { accessService } from "@/shared/services/accessService";
+import { userService } from "@/shared/services/userService";
+import type { DashboardStats, AccessRequest, AuditLog, Access, User } from "@/types";
 
 interface MetricCardProps {
   label: string;
@@ -48,24 +50,41 @@ function AuditIcon({ status }: { status: string }) {
   return <XCircle className="h-4 w-4 text-danger-500 shrink-0 mt-0.5" />;
 }
 
+interface SecurityAlert {
+  id: string;
+  type: 'expiring' | 'inactive-user' | 'high-privilege' | 'failed-login' | 'suspended-access';
+  title: string;
+  description: string;
+  severity: 'high' | 'medium' | 'low';
+  link: string;
+  linkText: string;
+}
+
 export default function DashboardPage() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [requests, setRequests] = useState<AccessRequest[]>([]);
   const [auditLogs, setAuditLogs] = useState<AuditLog[]>([]);
+  const [securityAlerts, setSecurityAlerts] = useState<SecurityAlert[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     async function loadData() {
       try {
         setIsLoading(true);
-        const [statsData, requestsData, auditData] = await Promise.all([
+        const [statsData, requestsData, auditData, allAccess, allUsers] = await Promise.all([
           dashboardService.getDashboardStats(),
           requestService.getRequests(),
           auditService.getAuditLogs(),
+          accessService.getAllAccess(),
+          userService.getUsers(),
         ]);
         setStats(statsData);
         setRequests(requestsData.slice(0, 6));
         setAuditLogs(auditData.slice(0, 6));
+
+        // Calculate security alerts
+        const alerts = calculateSecurityAlerts(allAccess, allUsers, requestsData, auditData);
+        setSecurityAlerts(alerts);
       } catch (err) {
         console.error("Error loading dashboard data", err);
       } finally {
@@ -74,6 +93,122 @@ export default function DashboardPage() {
     }
     loadData();
   }, []);
+
+  const calculateSecurityAlerts = (
+    accessList: Access[],
+    users: User[],
+    requestsList: AccessRequest[],
+    auditLogs: AuditLog[]
+  ): SecurityAlert[] => {
+    const alerts: SecurityAlert[] = [];
+    const now = new Date();
+
+    // 1. Access expiring soon (within 30 days)
+    const expiringAccess = accessList.filter((a) => {
+      if (!a.expiryDate || a.status !== 'ACTIVE') return false;
+      const expiryDate = new Date(a.expiryDate);
+      const daysUntilExpiry = Math.ceil((expiryDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+      return daysUntilExpiry > 0 && daysUntilExpiry <= 30;
+    });
+
+    if (expiringAccess.length > 0) {
+      alerts.push({
+        id: 'expiring-access',
+        type: 'expiring',
+        title: `${expiringAccess.length} access grant${expiringAccess.length > 1 ? 's' : ''} expiring soon`,
+        description: 'Access permissions expiring within 30 days require review',
+        severity: 'medium',
+        link: '/access',
+        linkText: 'Review access'
+      });
+    }
+
+    // 2. Inactive users with active access (no activity in 30+ days)
+    const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+    const inactiveUsersWithAccess = users.filter((user) => {
+      if (user.status !== 'ACTIVE') return false;
+      const lastActive = new Date(user.lastActive);
+      if (lastActive >= thirtyDaysAgo) return false;
+      // Check if user has active access
+      const hasActiveAccess = accessList.some(
+        (a) => a.userId === user.id && a.status === 'ACTIVE'
+      );
+      return hasActiveAccess;
+    });
+
+    if (inactiveUsersWithAccess.length > 0) {
+      alerts.push({
+        id: 'inactive-users',
+        type: 'inactive-user',
+        title: `${inactiveUsersWithAccess.length} inactive user${inactiveUsersWithAccess.length > 1 ? 's' : ''} with active access`,
+        description: 'Users inactive for 30+ days still have active permissions',
+        severity: 'high',
+        link: '/users',
+        linkText: 'Review users'
+      });
+    }
+
+    // 3. Pending high-privilege requests (Admin or Application Admin)
+    const highPrivilegeRequests = requestsList.filter((req) =>
+      req.status === 'PENDING' &&
+      (req.accessLevel === 'Admin' || req.roleName.toLowerCase().includes('admin'))
+    );
+
+    if (highPrivilegeRequests.length > 0) {
+      alerts.push({
+        id: 'high-privilege-requests',
+        type: 'high-privilege',
+        title: `${highPrivilegeRequests.length} pending high-privilege request${highPrivilegeRequests.length > 1 ? 's' : ''}`,
+        description: 'Admin-level access requests awaiting approval',
+        severity: 'high',
+        link: '/requests',
+        linkText: 'Review requests'
+      });
+    }
+
+    // 4. Recent failed login attempts
+    const recentFailedLogins = auditLogs.filter((log) => {
+      const logTime = new Date(log.timestamp);
+      const hoursSinceLog = (now.getTime() - logTime.getTime()) / (1000 * 60 * 60);
+      return log.action === 'USER_LOGIN' && log.status === 'FAILURE' && hoursSinceLog <= 24;
+    });
+
+    if (recentFailedLogins.length > 0) {
+      alerts.push({
+        id: 'failed-logins',
+        type: 'failed-login',
+        title: `${recentFailedLogins.length} failed login${recentFailedLogins.length > 1 ? 's' : ''} in last 24 hours`,
+        description: 'Authentication failures detected',
+        severity: 'medium',
+        link: '/audit',
+        linkText: 'View audit logs'
+      });
+    }
+
+    // 5. Suspended users with unrevoked access
+    const suspendedUsers = users.filter((u) => u.status === 'SUSPENDED');
+    const suspendedWithAccess = suspendedUsers.filter((user) => {
+      return accessList.some((a) => a.userId === user.id && a.status === 'ACTIVE');
+    });
+
+    if (suspendedWithAccess.length > 0) {
+      alerts.push({
+        id: 'suspended-users-access',
+        type: 'suspended-access',
+        title: `${suspendedWithAccess.length} suspended user${suspendedWithAccess.length > 1 ? 's' : ''} with active access`,
+        description: 'Suspended accounts still have active permissions',
+        severity: 'high',
+        link: '/users',
+        linkText: 'Review suspended users'
+      });
+    }
+
+    // Sort by severity (high -> medium -> low)
+    return alerts.sort((a, b) => {
+      const severityOrder = { high: 0, medium: 1, low: 2 };
+      return severityOrder[a.severity] - severityOrder[b.severity];
+    });
+  };
 
   const formatDate = (dateStr: string) =>
     new Date(dateStr).toLocaleString("en-US", {
@@ -141,6 +276,62 @@ export default function DashboardPage() {
           bg="bg-danger-50"
         />
       </div>
+
+      {/* ── Security Overview ── */}
+      {securityAlerts.length > 0 && (
+        <div className="bg-gradient-to-r from-danger-50 to-danger-50/50 rounded-xl border border-danger-100 p-5">
+          <div className="flex items-start gap-3 mb-4">
+            <div className="w-10 h-10 rounded-lg bg-danger-100 flex items-center justify-center shrink-0">
+              <ShieldAlert className="h-5 w-5 text-danger-600" />
+            </div>
+            <div className="flex-1">
+              <h2 className="text-sm font-semibold text-slate-900">Security Overview</h2>
+              <p className="text-xs text-slate-500 mt-0.5">
+                {securityAlerts.length} item{securityAlerts.length > 1 ? 's' : ''} require{securityAlerts.length === 1 ? 's' : ''} attention
+              </p>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            {securityAlerts.map((alert) => {
+              const severityColors = {
+                high: { bg: 'bg-danger-50', border: 'border-danger-200', text: 'text-danger-700', badge: 'bg-danger-100 text-danger-700' },
+                medium: { bg: 'bg-warning-50', border: 'border-warning-200', text: 'text-warning-700', badge: 'bg-warning-100 text-warning-700' },
+                low: { bg: 'bg-info-50', border: 'border-info-200', text: 'text-info-700', badge: 'bg-info-100 text-info-700' }
+              };
+              const colors = severityColors[alert.severity];
+
+              let AlertIcon = AlertTriangle;
+              if (alert.type === 'expiring') AlertIcon = Clock;
+              else if (alert.type === 'inactive-user') AlertIcon = UserX;
+              else if (alert.type === 'high-privilege') AlertIcon = ShieldAlert;
+              else if (alert.type === 'suspended-access') AlertIcon = UserX;
+
+              return (
+                <Link
+                  key={alert.id}
+                  to={alert.link}
+                  className={`block rounded-lg border ${colors.border} ${colors.bg} p-3 hover:shadow-sm transition-all group`}
+                >
+                  <div className="flex items-start gap-3">
+                    <AlertIcon className={`h-4 w-4 mt-0.5 shrink-0 ${colors.text}`} />
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-0.5">
+                        <p className={`text-sm font-semibold ${colors.text}`}>{alert.title}</p>
+                        <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium ${colors.badge}`}>
+                          {alert.severity.charAt(0).toUpperCase() + alert.severity.slice(1)}
+                        </span>
+                      </div>
+                      <p className="text-xs text-slate-500">{alert.description}</p>
+                    </div>
+                    <ArrowRight className={`h-4 w-4 ${colors.text} shrink-0 group-hover:translate-x-1 transition-transform`} />
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {/* ── Main Content Grid ── */}
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
