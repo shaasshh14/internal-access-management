@@ -77,7 +77,7 @@ export default function RoleDetailPage() {
               <Badge variant="success" className="mt-2">{role.status}</Badge>
             </div>
           </div>
-          <Button variant="secondary">Edit Role</Button>
+          <Button variant="secondary">Edit Roles</Button>
         </div>
       </Card>
 
