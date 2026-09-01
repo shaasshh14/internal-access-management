@@ -22,10 +22,13 @@ import LoginPage from "../../features/auth/pages/LoginPage";
 import NotFoundPage from "../../features/notFound/pages/NotFoundPage";
 import ProtectedRoute from "./ProtectedRoute";
 
+import { CommandPaletteProvider } from "../../shared/components/CommandPalette/CommandPaletteContext";
+
 export default function AppRouter() {
   return (
     <BrowserRouter>
-      <Routes>
+      <CommandPaletteProvider>
+        <Routes>
 
         {/* Public */}
         <Route path="/login" element={<LoginPage />} />
@@ -34,72 +37,40 @@ export default function AppRouter() {
         <Route element={<ProtectedRoute />}>
           <Route element={<DashboardLayout />}>
 
-            <Route
-              path="/dashboard"
-              element={<DashboardPage />}
-            />
+            <Route path="/dashboard" element={<DashboardPage />} />
 
-            <Route
-              path="/access"
-              element={<AccessPage />}
-            />
+            <Route path="/access" element={<AccessPage />} />
 
-            <Route
-              path="/users"
-              element={<UsersPage />}
-            />
-            <Route
-              path="/users/:id"
-              element={<UserDetailPage />}
-            />
+            <Route path="/users" element={<UsersPage />} />
+            <Route path="/users/:id" element={<UserDetailPage />} />
 
-            <Route
-              path="/applications"
-              element={<ApplicationsPage />}
-            />
+            <Route path="/applications" element={<ApplicationsPage />} />
             <Route
               path="/applications/:id"
               element={<ApplicationDetailPage />}
             />
 
-            <Route
-              path="/requests"
-              element={<RequestsPage />}
-            />
+            <Route path="/requests" element={<RequestsPage />} />
             <Route
               path="/requests/:id"
               element={<RequestDetailPage />}
             />
 
-            <Route
-              path="/roles"
-              element={<RolesPage />}
-            />
-            <Route
-              path="/roles/:id"
-              element={<RoleDetailPage />}
-            />
+            <Route path="/roles" element={<RolesPage />} />
+            <Route path="/roles/:id" element={<RoleDetailPage />} />
 
-            <Route
-              path="/audit"
-              element={<AuditPage />}
-            />
+            <Route path="/audit" element={<AuditPage />} />
 
-            <Route
-              path="/settings"
-              element={<SettingsPage />}
-            />
+            <Route path="/settings" element={<SettingsPage />} />
 
           </Route>
         </Route>
 
-        {/* Redirect root to dashboard */}
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
 
-        {/* 404 - Unidentified Route */}
         <Route path="*" element={<NotFoundPage />} />
-
-      </Routes>
+        </Routes>
+      </CommandPaletteProvider>
     </BrowserRouter>
   );
 }
