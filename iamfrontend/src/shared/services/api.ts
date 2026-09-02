@@ -1,9 +1,8 @@
 import axios from "axios";
-import { config } from "zod";
 import { refreshAccessToken } from "../../features/auth/services/refreshService";
 
 const api = axios.create ({
-    baseURL: import.meta.env.VITE_API_BASE_URL,
+    baseURL: import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8080",
     timeout: 10000,
 
     withCredentials: true,
@@ -15,6 +14,12 @@ const api = axios.create ({
 
 api.interceptors.request.use(
     (config) => {
+        const accessToken = localStorage.getItem("iam_access_token");
+
+        if (accessToken) {
+            config.headers.Authorization = `Bearer ${accessToken}`;
+        }
+
         return config;
     },
     (error) => {
@@ -27,10 +32,16 @@ api.interceptors.response.use (
     (response) => response,
     async (error) => {
         const originalRequest = error.config;
+        const hasAccessToken = Boolean(
+            localStorage.getItem("iam_access_token")
+        );
+        const isAuthRequest = originalRequest?.url?.startsWith("/auth/");
         
         if (
             error.response?.status === 401 &&
-            !originalRequest._retry
+            !originalRequest._retry &&
+            hasAccessToken &&
+            !isAuthRequest
         ) {
             originalRequest._retry = true;
 

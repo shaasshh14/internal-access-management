@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import axios from "axios";
 
 import { login } from "../services/authService";
 import { loginSchema } from "../validation/loginSchema";
@@ -32,15 +33,18 @@ export default function LoginPage() {
         setErrorMessage("");
         try {
             setIsLoading(true);
-            // Local demo: accept any non-empty credentials without backend
-            if (data.email && data.password) {
-                setIsAuthenticated();
-                navigate("/dashboard");
-            } else {
-                setErrorMessage("Please enter both email and password.");
-            }
+            await login(data);
+            setIsAuthenticated();
+            navigate("/dashboard");
         } catch (error) {
-            setErrorMessage("Login failed. Try again.");
+            if (axios.isAxiosError(error) && error.response) {
+                setErrorMessage("Invalid email or password.");
+                return;
+            }
+
+            // Local demo fallback when the backend is not running.
+            setIsAuthenticated();
+            navigate("/dashboard");
         } finally {
             setIsLoading(false);
         }

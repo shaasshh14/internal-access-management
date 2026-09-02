@@ -1,6 +1,7 @@
 package com.shashank.iam.iambackend.config;
 
 import com.shashank.iam.iambackend.modules.user.entity.User;
+import com.shashank.iam.iambackend.modules.user.entity.UserStatus;
 import com.shashank.iam.iambackend.modules.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
@@ -27,6 +28,11 @@ public class DevelopmentDataInitializer {
                     .password(passwordEncoder.encode("Admin@123"))
                     .firstName("Admin")
                     .lastName("User")
+                    .employeeId("EMP000")
+                    .department("Security")
+                    .role("IAM Administrator")
+                    .status(UserStatus.ACTIVE)
+                    .applicationCount(0)
                     .enabled(true)
                     .build();
 

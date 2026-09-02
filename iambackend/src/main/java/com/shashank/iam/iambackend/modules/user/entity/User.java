@@ -31,6 +31,28 @@ public class User {
     @Column(nullable = false, length = 100)
     private String lastName;
 
+    @Column(unique = true, length = 50)
+    private String employeeId;
+
+    @Column(length = 100)
+    private String department;
+
+    @Column(length = 100)
+    private String role;
+
+    @Enumerated(EnumType.STRING)
+    @Column(length = 20)
+    @Builder.Default
+    private UserStatus status = UserStatus.ACTIVE;
+
+    @Column
+    @Builder.Default
+    private LocalDateTime lastActive = LocalDateTime.now();
+
+    @Column
+    @Builder.Default
+    private Integer applicationCount = 0;
+
     @Column(nullable = false)
     @Builder.Default
     private boolean enabled = true;

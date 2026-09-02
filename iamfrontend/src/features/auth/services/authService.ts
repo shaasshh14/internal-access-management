@@ -12,9 +12,17 @@ export async function login (
         "/auth/login",
         data
     );
+    localStorage.setItem(
+        "iam_access_token",
+        response.data.accessToken
+    );
     return response.data;
 }
 
 export async function logout() {
-    await api.post("/auth/logout");
+    try {
+        await api.post("/auth/logout");
+    } finally {
+        localStorage.removeItem("iam_access_token");
+    }
 }
