@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -37,19 +39,14 @@ public class User {
     @Column(length = 100)
     private String department;
 
-    @Column(length = 100)
-    private String role;
-
     @Enumerated(EnumType.STRING)
-    @Column(length = 20)
+    @Column(nullable = false, length = 20)
     @Builder.Default
     private UserStatus status = UserStatus.ACTIVE;
 
-    @Column
-    @Builder.Default
-    private LocalDateTime lastActive = LocalDateTime.now();
+    private LocalDateTime lastActive;
 
-    @Column
+    @Column(nullable = false)
     @Builder.Default
     private Integer applicationCount = 0;
 
@@ -63,11 +60,20 @@ public class User {
     @Column(nullable = false)
     private LocalDateTime updatedAt;
 
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
+    @Builder.Default
+    private Set<Role> roles = new HashSet<>();
+
     @PrePersist
     protected void onCreate() {
         LocalDateTime now = LocalDateTime.now();
         createdAt = now;
         updatedAt = now;
+
+        if (lastActive == null) {
+            lastActive = now;
+        }
     }
 
     @PreUpdate
