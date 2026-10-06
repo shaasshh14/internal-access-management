@@ -1,6 +1,7 @@
 package com.shashank.iam.iambackend.modules.role.service;
 
 import com.shashank.iam.iambackend.modules.permission.entity.Permission;
+import com.shashank.iam.iambackend.modules.permission.repository.PermissionRepository;
 import com.shashank.iam.iambackend.modules.role.dto.request.CreateRoleRequest;
 import com.shashank.iam.iambackend.modules.role.dto.request.UpdateRoleRequest;
 import com.shashank.iam.iambackend.modules.role.dto.response.RoleResponse;
@@ -10,7 +11,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Set;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -20,6 +23,7 @@ import java.util.stream.Collectors;
 public class RoleService {
 
     private final RoleRepository roleRepository;
+    private final PermissionRepository permissionRepository;
 
     public List<RoleResponse> getRoles() {
         return roleRepository.findAll()
@@ -80,6 +84,70 @@ public class RoleService {
         }
 
         roleRepository.delete(role);
+    }
+
+    @Transactional(readOnly = true)
+    public Set<UUID> getRolePermissions(UUID roleId) {
+        Role role = findRole(roleId);
+
+        return role.getPermissions()
+                .stream()
+                .map(Permission::getId)
+                .collect(Collectors.toSet());
+    }
+
+    @Transactional
+    public RoleResponse assignPermissionToRole(
+            UUID roleId,
+            UUID permissionId) {
+
+        Role role = findRole(roleId);
+
+        Permission permission = permissionRepository.findById(permissionId)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Permission not found: " + permissionId
+                ));
+
+        if (role.getPermissions().contains(permission)) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "Permission is already assigned to role"
+            );
+        }
+
+        role.getPermissions().add(permission);
+
+        roleRepository.save(role);
+
+        return toResponse(role);
+    }
+
+    @Transactional
+    public RoleResponse removePermissionFromRole(
+            UUID roleId,
+            UUID permissionId) {
+
+        Role role = findRole(roleId);
+
+        Permission permission = permissionRepository.findById(permissionId)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Permission not found: " + permissionId
+                ));
+
+        if (!role.getPermissions().contains(permission)) {
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND,
+                    "Permission is not assigned to role"
+            );
+        }
+
+        role.getPermissions().remove(permission);
+
+        roleRepository.save(role);
+
+        return toResponse(role);
     }
 
     private Role findRole(UUID id) {
