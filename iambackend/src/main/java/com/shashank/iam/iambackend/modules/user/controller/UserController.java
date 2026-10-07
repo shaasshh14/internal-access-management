@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import org.springframework.security.access.prepost.PreAuthorize;
+
 import java.util.List;
 import java.util.UUID;
 
@@ -28,16 +30,19 @@ public class UserController {
 
     private final UserService userService;
 
+    @PreAuthorize("hasAuthority('USER_READ')")
     @GetMapping
     public ResponseEntity<List<UserResponse>> getUsers() {
         return ResponseEntity.ok(userService.getUsers());
     }
 
+    @PreAuthorize("hasAuthority('USER_READ')")
     @GetMapping("/{id}")
     public ResponseEntity<UserResponse> getUserById(@PathVariable UUID id) {
         return ResponseEntity.ok(userService.getUserById(id));
     }
 
+    @PreAuthorize("hasAuthority('USER_WRITE')")
     @PostMapping
     public ResponseEntity<UserResponse> createUser(
             @Valid @RequestBody CreateUserRequest request) {
@@ -49,6 +54,7 @@ public class UserController {
                 .body(userService.createUser(request));
     }
 
+    @PreAuthorize("hasAuthority('USER_WRITE')")
     @PutMapping("/{id}")
     public ResponseEntity<UserResponse> updateUser(
             @PathVariable UUID id,
@@ -58,6 +64,7 @@ public class UserController {
                 userService.updateUser(id, request));
     }
 
+    @PreAuthorize("hasAuthority('USER_STATUS_UPDATE')")
     @PatchMapping("/{id}/status")
     public ResponseEntity<UserResponse> updateUserStatus(
             @PathVariable UUID id,

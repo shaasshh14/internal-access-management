@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.List;
 import java.util.UUID;
@@ -21,12 +22,14 @@ public class ApplicationController {
 
     private final ApplicationService applicationService;
 
+    @PreAuthorize("hasAuthority('APPLICATION_READ')")
     @GetMapping
     public ResponseEntity<List<ApplicationResponse>> getApplications() {
         return ResponseEntity.ok(
                 applicationService.getApplications());
     }
 
+    @PreAuthorize("hasAuthority('APPLICATION_READ')")
     @GetMapping("/{id}")
     public ResponseEntity<ApplicationResponse> getApplicationById(
             @PathVariable UUID id) {
@@ -35,6 +38,7 @@ public class ApplicationController {
                 applicationService.getApplicationById(id));
     }
 
+    @PreAuthorize("hasAuthority('APPLICATION_WRITE')")
     @PostMapping
     public ResponseEntity<ApplicationResponse> createApplication(
             @Valid @RequestBody CreateApplicationRequest request) {
@@ -44,6 +48,7 @@ public class ApplicationController {
                 .body(applicationService.createApplication(request));
     }
 
+    @PreAuthorize("hasAuthority('APPLICATION_WRITE')")
     @PutMapping("/{id}")
     public ResponseEntity<ApplicationResponse> updateApplication(
             @PathVariable UUID id,
@@ -53,6 +58,7 @@ public class ApplicationController {
                 applicationService.updateApplication(id, request));
     }
 
+    @PreAuthorize("hasAuthority('APPLICATION_WRITE')")
     @PatchMapping("/{id}/status")
     public ResponseEntity<ApplicationResponse> updateApplicationStatus(
             @PathVariable UUID id,

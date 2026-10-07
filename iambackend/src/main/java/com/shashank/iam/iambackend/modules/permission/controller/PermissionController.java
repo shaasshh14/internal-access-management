@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.List;
 import java.util.UUID;
@@ -20,11 +21,13 @@ public class PermissionController {
 
     private final PermissionService permissionService;
 
+    @PreAuthorize("hasAuthority('PERMISSION_READ')")
     @GetMapping
     public ResponseEntity<List<PermissionResponse>> getPermissions() {
         return ResponseEntity.ok(permissionService.getPermissions());
     }
 
+    @PreAuthorize("hasAuthority('PERMISSION_READ')")
     @GetMapping("/{id}")
     public ResponseEntity<PermissionResponse> getPermissionById(
             @PathVariable UUID id) {
@@ -34,6 +37,7 @@ public class PermissionController {
         );
     }
 
+    @PreAuthorize("hasAuthority('PERMISSION_WRITE')")
     @PostMapping
     public ResponseEntity<PermissionResponse> createPermission(
             @Valid @RequestBody CreatePermissionRequest request) {
@@ -43,6 +47,7 @@ public class PermissionController {
                 .body(permissionService.createPermission(request));
     }
 
+    @PreAuthorize("hasAuthority('PERMISSION_WRITE')")
     @PutMapping("/{id}")
     public ResponseEntity<PermissionResponse> updatePermission(
             @PathVariable UUID id,
@@ -53,6 +58,7 @@ public class PermissionController {
         );
     }
 
+    @PreAuthorize("hasAuthority('PERMISSION_WRITE')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletePermission(
             @PathVariable UUID id) {

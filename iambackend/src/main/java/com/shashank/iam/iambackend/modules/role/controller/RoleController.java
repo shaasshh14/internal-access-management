@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.List;
 import java.util.UUID;
@@ -21,16 +22,19 @@ public class RoleController {
 
     private final RoleService roleService;
 
+    @PreAuthorize("hasAuthority('ROLE_READ')")
     @GetMapping
     public ResponseEntity<List<RoleResponse>> getRoles() {
         return ResponseEntity.ok(roleService.getRoles());
     }
 
+    @PreAuthorize("hasAuthority('ROLE_READ')")
     @GetMapping("/{id}")
     public ResponseEntity<RoleResponse> getRoleById(@PathVariable UUID id) {
         return ResponseEntity.ok(roleService.getRoleById(id));
     }
 
+    @PreAuthorize("hasAuthority('ROLE_WRITE')")
     @PostMapping
     public ResponseEntity<RoleResponse> createRole(
             @Valid @RequestBody CreateRoleRequest request) {
@@ -40,6 +44,7 @@ public class RoleController {
                 .body(roleService.createRole(request));
     }
 
+    @PreAuthorize("hasAuthority('ROLE_WRITE')")
     @PutMapping("/{id}")
     public ResponseEntity<RoleResponse> updateRole(
             @PathVariable UUID id,
@@ -48,12 +53,14 @@ public class RoleController {
         return ResponseEntity.ok(roleService.updateRole(id, request));
     }
 
+    @PreAuthorize("hasAuthority('ROLE_WRITE')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteRole(@PathVariable UUID id) {
         roleService.deleteRole(id);
         return ResponseEntity.noContent().build();
     }
 
+    @PreAuthorize("hasAuthority('ROLE_READ')")
     @GetMapping("/{roleId}/permissions")
     public ResponseEntity<Set<UUID>> getRolePermissions(
             @PathVariable UUID roleId) {
@@ -63,6 +70,7 @@ public class RoleController {
         );
     }
 
+    @PreAuthorize("hasAuthority('PERMISSION_WRITE')")
     @PostMapping("/{roleId}/permissions/{permissionId}")
     public ResponseEntity<RoleResponse> assignPermissionToRole(
             @PathVariable UUID roleId,
@@ -73,6 +81,7 @@ public class RoleController {
         );
     }
 
+    @PreAuthorize("hasAuthority('PERMISSION_WRITE')")
     @DeleteMapping("/{roleId}/permissions/{permissionId}")
     public ResponseEntity<RoleResponse> removePermissionFromRole(
             @PathVariable UUID roleId,
