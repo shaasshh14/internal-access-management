@@ -4,6 +4,7 @@ import com.shashank.iam.iambackend.modules.accessrequest.dto.request.CreateAcces
 import com.shashank.iam.iambackend.modules.accessrequest.dto.request.ReviewAccessRequest;
 import com.shashank.iam.iambackend.modules.accessrequest.dto.response.AccessRequestResponse;
 import com.shashank.iam.iambackend.modules.accessrequest.service.AccessRequestService;
+import com.shashank.iam.iambackend.modules.accessrequest.dto.response.ApplicationAccessResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -65,6 +66,34 @@ public class AccessRequestController {
     ) {
         return ResponseEntity.ok(
                 accessRequestService.rejectRequest(id, request)
+        );
+    }
+
+    @DeleteMapping("/{id}/revoke")
+    @PreAuthorize("hasAuthority('ACCESS_REVOKE')")
+    public ResponseEntity<AccessRequestResponse> revokeAccess(
+            @PathVariable UUID id
+    ) {
+        return ResponseEntity.ok(
+                accessRequestService.revokeAccess(id)
+        );
+    }
+
+    @GetMapping("/my/access")
+    @PreAuthorize("hasAuthority('ACCESS_REQUEST_READ')")
+    public ResponseEntity<List<ApplicationAccessResponse>> getMyAccess() {
+        return ResponseEntity.ok(
+                accessRequestService.getMyAccess()
+        );
+    }
+
+    @GetMapping("/applications/{applicationId}/access")
+    @PreAuthorize("hasAuthority('ACCESS_REQUEST_READ')")
+    public ResponseEntity<List<ApplicationAccessResponse>> getApplicationAccess(
+            @PathVariable UUID applicationId
+    ) {
+        return ResponseEntity.ok(
+                accessRequestService.getApplicationAccess(applicationId)
         );
     }
 }
