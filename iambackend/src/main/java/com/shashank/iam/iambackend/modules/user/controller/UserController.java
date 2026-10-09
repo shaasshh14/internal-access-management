@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 
@@ -45,32 +46,33 @@ public class UserController {
     @PreAuthorize("hasAuthority('USER_WRITE')")
     @PostMapping
     public ResponseEntity<UserResponse> createUser(
-            @Valid @RequestBody CreateUserRequest request) {
-
-        System.out.println(">>> CREATE USER CONTROLLER REACHED");
+            @Valid @RequestBody CreateUserRequest request,
+            HttpServletRequest httpRequest) {
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(userService.createUser(request));
+                .body(userService.createUser(request, httpRequest));
     }
 
     @PreAuthorize("hasAuthority('USER_WRITE')")
     @PutMapping("/{id}")
     public ResponseEntity<UserResponse> updateUser(
             @PathVariable UUID id,
-            @Valid @RequestBody UpdateUserRequest request) {
+            @Valid @RequestBody UpdateUserRequest request,
+            HttpServletRequest httpRequest) {
 
         return ResponseEntity.ok(
-                userService.updateUser(id, request));
+                userService.updateUser(id, request, httpRequest));
     }
 
     @PreAuthorize("hasAuthority('USER_STATUS_UPDATE')")
     @PatchMapping("/{id}/status")
     public ResponseEntity<UserResponse> updateUserStatus(
             @PathVariable UUID id,
-            @Valid @RequestBody UpdateUserStatusRequest request) {
+            @Valid @RequestBody UpdateUserStatusRequest request,
+            HttpServletRequest httpRequest) {
 
         return ResponseEntity.ok(
-                userService.updateUserStatus(id, request));
+            userService.updateUserStatus(id, request, httpRequest));
     }
 }

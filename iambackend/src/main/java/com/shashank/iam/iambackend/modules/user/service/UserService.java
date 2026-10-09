@@ -9,6 +9,8 @@ import com.shashank.iam.iambackend.modules.user.dto.response.UserResponse;
 import com.shashank.iam.iambackend.modules.user.entity.User;
 import com.shashank.iam.iambackend.modules.user.entity.UserStatus;
 import com.shashank.iam.iambackend.modules.user.repository.UserRepository;
+import com.shashank.iam.iambackend.modules.audit.service.AuditLogService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -26,6 +28,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
+    private final AuditLogService auditLogService;
 
     @Transactional(readOnly = true)
     public List<UserResponse> getUsers() {
@@ -41,7 +44,10 @@ public class UserService {
     }
 
     @Transactional
-    public UserResponse createUser(CreateUserRequest request) {
+    public UserResponse createUser(
+        CreateUserRequest request,
+        HttpServletRequest httpRequest
+    ) {
 
     try {
             System.out.println(">>> CREATE USER SERVICE REACHED");
@@ -103,7 +109,13 @@ public class UserService {
 
             UserResponse response = toResponse(savedUser);
 
-            System.out.println(">>> RESPONSE CREATED");
+            auditLogService.log(
+                    "USER_CREATED",
+                    "USER",
+                    savedUser.getId(),
+                    "User created: " + savedUser.getEmail(),
+                    httpRequest
+            );
 
             return response;
 
@@ -119,7 +131,11 @@ public class UserService {
     }
     
     @Transactional
-    public UserResponse updateUser(UUID id, UpdateUserRequest request) {
+    public UserResponse updateUser(
+        UUID id,
+        UpdateUserRequest request,
+        HttpServletRequest httpRequest
+    ) {
         User user = findUser(id);
 
         userRepository.findByEmail(request.getEmail())
@@ -153,20 +169,43 @@ public class UserService {
         user.getRoles().clear();
         user.getRoles().add(role);
 
-        return toResponse(userRepository.save(user));
+        User savedUser = userRepository.save(user);
+
+        auditLogService.log(
+                "USER_UPDATED",
+                "USER",
+                savedUser.getId(),
+                "User updated: " + savedUser.getEmail(),
+                httpRequest
+        );
+
+        return toResponse(savedUser);
     }
 
     @Transactional
     public UserResponse updateUserStatus(
-            UUID id,
-            UpdateUserStatusRequest request) {
+        UUID id,
+        UpdateUserStatusRequest request,
+        HttpServletRequest httpRequest
+    ) {
 
         User user = findUser(id);
 
         user.setStatus(request.getStatus());
         user.setEnabled(request.getStatus() == UserStatus.ACTIVE);
 
-        return toResponse(userRepository.save(user));
+        User savedUser = userRepository.save(user);
+
+        auditLogService.log(
+                "USER_STATUS_CHANGED",
+                "USER",
+                savedUser.getId(),
+                "User status changed to " + savedUser.getStatus()
+                        + " for " + savedUser.getEmail(),
+                httpRequest
+        );
+
+        return toResponse(savedUser);
     }
 
     private User findUser(UUID id) {
@@ -235,7 +274,7 @@ public class UserService {
     }
 
     private record NameParts(
-            String firstName,
-            String lastName) {
+        String firstName,
+        String lastName) {
     }
 }

@@ -21,6 +21,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
+import jakarta.servlet.http.HttpServletRequest;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -37,7 +38,7 @@ public class AccessRequestService {
     private final AuditLogService auditLogService;
 
     @Transactional
-    public AccessRequestResponse createRequest(CreateAccessRequest request) {
+    public AccessRequestResponse createRequest(CreateAccessRequest request, HttpServletRequest httpRequest) {
 
         User requester = getCurrentUser();
 
@@ -99,7 +100,8 @@ public class AccessRequestService {
             "ACCESS_REQUEST",
             savedRequest.getId(),
             "Access request created for application "
-                + savedRequest.getApplication().getName()
+                + savedRequest.getApplication().getName(),
+            httpRequest
         );
 
         return toResponse(savedRequest);
@@ -129,7 +131,8 @@ public class AccessRequestService {
 
     @Transactional
     public AccessRequestResponse approveRequest(
-        UUID requestId
+        UUID requestId,
+        HttpServletRequest httpRequest
     ) {
 
         AccessRequest accessRequest = findRequest(requestId);
@@ -182,7 +185,8 @@ public class AccessRequestService {
             "ACCESS_REQUEST",
             savedRequest.getId(),
             "Access request approved for application "
-                + savedRequest.getApplication().getName()
+                + savedRequest.getApplication().getName(),
+            httpRequest
         );
 
         return toResponse(savedRequest);
@@ -191,7 +195,8 @@ public class AccessRequestService {
     @Transactional
     public AccessRequestResponse rejectRequest(
             UUID requestId,
-            ReviewAccessRequest request
+            ReviewAccessRequest request,
+            HttpServletRequest httpRequest
     ) {
 
         AccessRequest accessRequest = findRequest(requestId);
@@ -213,18 +218,19 @@ public class AccessRequestService {
         AccessRequest savedRequest = accessRequestRepository.save(accessRequest);
 
         auditLogService.log(
-                "ACCESS_REQUEST_REJECTED",
-                "ACCESS_REQUEST",
-                savedRequest.getId(),
-                "Access request rejected for application "
-                        + savedRequest.getApplication().getName()
+            "ACCESS_REQUEST_REJECTED",
+            "ACCESS_REQUEST",
+            savedRequest.getId(),
+            "Access request rejected for application "
+                + savedRequest.getApplication().getName(),
+            httpRequest
         );
 
         return toResponse(savedRequest);
     }
 
     @Transactional
-    public AccessRequestResponse revokeAccess(UUID requestId) {
+    public AccessRequestResponse revokeAccess(UUID requestId, HttpServletRequest httpRequest) {
 
         AccessRequest accessRequest = findRequest(requestId);
 
@@ -263,11 +269,12 @@ public class AccessRequestService {
         accessRequestRepository.save(accessRequest);
 
         auditLogService.log(
-                "ACCESS_REQUEST_REVOKED",
-                "ACCESS_REQUEST",
-                savedRequest.getId(),
-                "Application access revoked for "
-                        + savedRequest.getApplication().getName()
+            "ACCESS_REQUEST_REVOKED",
+            "ACCESS_REQUEST",
+            savedRequest.getId(),
+            "Application access revoked for "
+                + savedRequest.getApplication().getName(),
+            httpRequest
         );
 
         return toResponse(savedRequest);

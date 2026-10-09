@@ -12,6 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import jakarta.servlet.http.HttpServletRequest;
+
 import java.util.List;
 import java.util.UUID;
 
@@ -25,11 +27,12 @@ public class AccessRequestController {
     @PostMapping
     @PreAuthorize("hasAuthority('ACCESS_REQUEST_CREATE')")
     public ResponseEntity<AccessRequestResponse> createRequest(
-            @Valid @RequestBody CreateAccessRequest request
+            @Valid @RequestBody CreateAccessRequest request,
+            HttpServletRequest httpRequest
     ) {
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(accessRequestService.createRequest(request));
+    return ResponseEntity
+            .status(HttpStatus.CREATED)
+            .body(accessRequestService.createRequest(request, httpRequest));
     }
 
     @GetMapping("/my")
@@ -51,10 +54,11 @@ public class AccessRequestController {
     @PostMapping("/{id}/approve")
     @PreAuthorize("hasAuthority('ACCESS_REQUEST_APPROVE')")
     public ResponseEntity<AccessRequestResponse> approveRequest(
-            @PathVariable UUID id
+            @PathVariable UUID id,
+            HttpServletRequest httpRequest
     ) {
         return ResponseEntity.ok(
-                accessRequestService.approveRequest(id)
+                accessRequestService.approveRequest(id, httpRequest)
         );
     }
 
@@ -62,20 +66,22 @@ public class AccessRequestController {
     @PreAuthorize("hasAuthority('ACCESS_REQUEST_REJECT')")
     public ResponseEntity<AccessRequestResponse> rejectRequest(
             @PathVariable UUID id,
-            @Valid @RequestBody ReviewAccessRequest request
+            @Valid @RequestBody ReviewAccessRequest request,
+            HttpServletRequest httpRequest
     ) {
         return ResponseEntity.ok(
-                accessRequestService.rejectRequest(id, request)
+                accessRequestService.rejectRequest(id, request, httpRequest)
         );
     }
 
     @DeleteMapping("/{id}/revoke")
     @PreAuthorize("hasAuthority('ACCESS_REVOKE')")
     public ResponseEntity<AccessRequestResponse> revokeAccess(
-            @PathVariable UUID id
+            @PathVariable UUID id,
+            HttpServletRequest httpRequest
     ) {
         return ResponseEntity.ok(
-                accessRequestService.revokeAccess(id)
+                accessRequestService.revokeAccess(id, httpRequest)
         );
     }
 
