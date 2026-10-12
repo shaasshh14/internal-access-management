@@ -11,6 +11,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
+import com.shashank.iam.iambackend.modules.audit.service.AuditLogService;
+import jakarta.servlet.http.HttpServletRequest;
 
 import java.util.List;
 import java.util.UUID;
@@ -20,6 +22,7 @@ import java.util.UUID;
 public class ApplicationService {
 
     private final ApplicationRepository applicationRepository;
+    private final AuditLogService auditLogService;
 
     @Transactional(readOnly = true)
     public List<ApplicationResponse> getApplications() {
@@ -36,7 +39,8 @@ public class ApplicationService {
 
     @Transactional
     public ApplicationResponse createApplication(
-            CreateApplicationRequest request) {
+            CreateApplicationRequest request,
+            HttpServletRequest httpRequest) {
 
         String name = request.getName().trim();
 
@@ -54,13 +58,24 @@ public class ApplicationService {
                 .status(request.getStatus())
                 .build();
 
-        return toResponse(applicationRepository.save(application));
+        Application savedApplication = applicationRepository.save(application);
+
+        auditLogService.log(
+                "APPLICATION_CREATED",
+                "APPLICATION",
+                savedApplication.getId(),
+                "Application created: " + savedApplication.getName(),
+                httpRequest
+        );
+
+        return toResponse(savedApplication);
     }
 
     @Transactional
     public ApplicationResponse updateApplication(
             UUID id,
-            UpdateApplicationRequest request) {
+            UpdateApplicationRequest request,
+            HttpServletRequest httpRequest) {
 
         Application application = findApplication(id);
 
@@ -83,19 +98,41 @@ public class ApplicationService {
                 normalizeOptional(request.getDepartment()));
         application.setStatus(request.getStatus());
 
-        return toResponse(applicationRepository.save(application));
+        Application savedApplication = applicationRepository.save(application);
+
+        auditLogService.log(
+                "APPLICATION_UPDATED",
+                "APPLICATION",
+                savedApplication.getId(),
+                "Application updated: " + savedApplication.getName(),
+                httpRequest
+        );
+
+        return toResponse(savedApplication);
     }
 
     @Transactional
     public ApplicationResponse updateApplicationStatus(
             UUID id,
-            UpdateApplicationStatusRequest request) {
+            UpdateApplicationStatusRequest request,
+            HttpServletRequest httpRequest) {
 
         Application application = findApplication(id);
 
         application.setStatus(request.getStatus());
 
-        return toResponse(applicationRepository.save(application));
+        Application savedApplication = applicationRepository.save(application);
+
+        auditLogService.log(
+                "APPLICATION_STATUS_CHANGED",
+                "APPLICATION",
+                savedApplication.getId(),
+                "Application status changed to " + savedApplication.getStatus()
+                        + " for " + savedApplication.getName(),
+                httpRequest
+        );
+
+        return toResponse(savedApplication);
     }
 
     private Application findApplication(UUID id) {

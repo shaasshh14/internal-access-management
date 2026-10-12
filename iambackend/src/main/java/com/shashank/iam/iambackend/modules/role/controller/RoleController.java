@@ -11,6 +11,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.security.access.prepost.PreAuthorize;
 
+import jakarta.servlet.http.HttpServletRequest;
+
 import java.util.List;
 import java.util.UUID;
 import java.util.Set;
@@ -37,26 +39,29 @@ public class RoleController {
     @PreAuthorize("hasAuthority('ROLE_WRITE')")
     @PostMapping
     public ResponseEntity<RoleResponse> createRole(
-            @Valid @RequestBody CreateRoleRequest request) {
+            @Valid @RequestBody CreateRoleRequest request,
+            HttpServletRequest httpRequest) {
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(roleService.createRole(request));
+                .body(roleService.createRole(request, httpRequest));
     }
 
     @PreAuthorize("hasAuthority('ROLE_WRITE')")
     @PutMapping("/{id}")
     public ResponseEntity<RoleResponse> updateRole(
             @PathVariable UUID id,
-            @Valid @RequestBody UpdateRoleRequest request) {
+            @Valid @RequestBody UpdateRoleRequest request,
+            HttpServletRequest httpRequest) {
 
-        return ResponseEntity.ok(roleService.updateRole(id, request));
+        return ResponseEntity.ok(roleService.updateRole(id, request, httpRequest));
     }
 
     @PreAuthorize("hasAuthority('ROLE_WRITE')")
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteRole(@PathVariable UUID id) {
-        roleService.deleteRole(id);
+    public ResponseEntity<Void> deleteRole(@PathVariable UUID id,
+        HttpServletRequest httpRequest) {
+        roleService.deleteRole(id, httpRequest);
         return ResponseEntity.noContent().build();
     }
 
@@ -74,10 +79,11 @@ public class RoleController {
     @PostMapping("/{roleId}/permissions/{permissionId}")
     public ResponseEntity<RoleResponse> assignPermissionToRole(
             @PathVariable UUID roleId,
-            @PathVariable UUID permissionId) {
+            @PathVariable UUID permissionId,
+            HttpServletRequest httpRequest) {
 
         return ResponseEntity.ok(
-                roleService.assignPermissionToRole(roleId, permissionId)
+                roleService.assignPermissionToRole(roleId, permissionId, httpRequest)
         );
     }
 
@@ -85,10 +91,11 @@ public class RoleController {
     @DeleteMapping("/{roleId}/permissions/{permissionId}")
     public ResponseEntity<RoleResponse> removePermissionFromRole(
             @PathVariable UUID roleId,
-            @PathVariable UUID permissionId) {
+            @PathVariable UUID permissionId,
+            HttpServletRequest httpRequest) {
 
         return ResponseEntity.ok(
-                roleService.removePermissionFromRole(roleId, permissionId)
+                roleService.removePermissionFromRole(roleId, permissionId, httpRequest)
         );
     }
 }

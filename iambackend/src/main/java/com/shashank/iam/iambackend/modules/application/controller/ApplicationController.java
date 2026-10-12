@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.security.access.prepost.PreAuthorize;
+import jakarta.servlet.http.HttpServletRequest;
 
 import java.util.List;
 import java.util.UUID;
@@ -41,30 +42,33 @@ public class ApplicationController {
     @PreAuthorize("hasAuthority('APPLICATION_WRITE')")
     @PostMapping
     public ResponseEntity<ApplicationResponse> createApplication(
-            @Valid @RequestBody CreateApplicationRequest request) {
+            @Valid @RequestBody CreateApplicationRequest request,
+            HttpServletRequest httpRequest) {
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(applicationService.createApplication(request));
+                .body(applicationService.createApplication(request, httpRequest));
     }
 
     @PreAuthorize("hasAuthority('APPLICATION_WRITE')")
     @PutMapping("/{id}")
     public ResponseEntity<ApplicationResponse> updateApplication(
             @PathVariable UUID id,
-            @Valid @RequestBody UpdateApplicationRequest request) {
+            @Valid @RequestBody UpdateApplicationRequest request
+            , HttpServletRequest httpRequest) {
 
         return ResponseEntity.ok(
-                applicationService.updateApplication(id, request));
+                applicationService.updateApplication(id, request, httpRequest));
     }
 
     @PreAuthorize("hasAuthority('APPLICATION_WRITE')")
     @PatchMapping("/{id}/status")
     public ResponseEntity<ApplicationResponse> updateApplicationStatus(
             @PathVariable UUID id,
-            @Valid @RequestBody UpdateApplicationStatusRequest request) {
+            @Valid @RequestBody UpdateApplicationStatusRequest request,
+            HttpServletRequest httpRequest) {
 
         return ResponseEntity.ok(
-                applicationService.updateApplicationStatus(id, request));
+                applicationService.updateApplicationStatus(id, request, httpRequest));
     }
 }

@@ -7,11 +7,14 @@ import com.shashank.iam.iambackend.modules.role.dto.request.UpdateRoleRequest;
 import com.shashank.iam.iambackend.modules.role.dto.response.RoleResponse;
 import com.shashank.iam.iambackend.modules.role.entity.Role;
 import com.shashank.iam.iambackend.modules.role.repository.RoleRepository;
+import com.shashank.iam.iambackend.modules.audit.service.AuditLogService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.transaction.annotation.Transactional;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 import java.util.Set;
 import java.util.List;
@@ -24,6 +27,7 @@ public class RoleService {
 
     private final RoleRepository roleRepository;
     private final PermissionRepository permissionRepository;
+    private final AuditLogService auditLogService;
 
     public List<RoleResponse> getRoles() {
         return roleRepository.findAll()
@@ -36,7 +40,8 @@ public class RoleService {
         return toResponse(findRole(id));
     }
 
-    public RoleResponse createRole(CreateRoleRequest request) {
+    public RoleResponse createRole(CreateRoleRequest request,
+        HttpServletRequest httpRequest) {
         String name = normalizeName(request.getName());
 
         if (roleRepository.existsByNameIgnoreCase(name)) {
@@ -51,10 +56,21 @@ public class RoleService {
                 .description(normalizeOptional(request.getDescription()))
                 .build();
 
-        return toResponse(roleRepository.save(role));
+        Role savedRole = roleRepository.save(role);
+
+        auditLogService.log(
+            "ROLE_CREATED",
+            "ROLE",
+            savedRole.getId(),
+            "Role created: " + savedRole.getName(),
+            httpRequest
+        );
+
+        return toResponse(savedRole);
     }
 
-    public RoleResponse updateRole(UUID id, UpdateRoleRequest request) {
+    public RoleResponse updateRole(UUID id, UpdateRoleRequest request,
+        HttpServletRequest httpRequest) {
         Role role = findRole(id);
         String name = normalizeName(request.getName());
 
@@ -70,10 +86,20 @@ public class RoleService {
         role.setName(name);
         role.setDescription(normalizeOptional(request.getDescription()));
 
-        return toResponse(roleRepository.save(role));
+        Role savedRole = roleRepository.save(role);
+
+        auditLogService.log(
+            "ROLE_UPDATED",
+            "ROLE",
+            savedRole.getId(),
+            "Role updated: " + savedRole.getName(),
+            httpRequest
+        );
+
+        return toResponse(savedRole);
     }
 
-    public void deleteRole(UUID id) {
+    public void deleteRole(UUID id, HttpServletRequest httpRequest) {
         Role role = findRole(id);
 
         if (!role.getUsers().isEmpty()) {
@@ -83,7 +109,18 @@ public class RoleService {
             );
         }
 
+        UUID deletedRoleId = role.getId();
+        String deletedRoleName = role.getName();
+
         roleRepository.delete(role);
+
+        auditLogService.log(
+                "ROLE_DELETED",
+                "ROLE",
+                deletedRoleId,
+                "Role deleted: " + deletedRoleName,
+                httpRequest
+        );
     }
 
     @Transactional(readOnly = true)
@@ -99,7 +136,8 @@ public class RoleService {
     @Transactional
     public RoleResponse assignPermissionToRole(
             UUID roleId,
-            UUID permissionId) {
+            UUID permissionId,
+            HttpServletRequest httpRequest) {
 
         Role role = findRole(roleId);
 
@@ -118,15 +156,25 @@ public class RoleService {
 
         role.getPermissions().add(permission);
 
-        roleRepository.save(role);
+        Role savedRole = roleRepository.save(role);
 
-        return toResponse(role);
+        auditLogService.log(
+                "ROLE_PERMISSION_ASSIGNED",
+                "ROLE",
+                savedRole.getId(),
+                "Permission " + permission.getName()
+                        + " assigned to role " + savedRole.getName(),
+                httpRequest
+        );
+
+        return toResponse(savedRole);
     }
 
     @Transactional
     public RoleResponse removePermissionFromRole(
             UUID roleId,
-            UUID permissionId) {
+            UUID permissionId,
+            HttpServletRequest httpRequest) {
 
         Role role = findRole(roleId);
 
@@ -145,9 +193,18 @@ public class RoleService {
 
         role.getPermissions().remove(permission);
 
-        roleRepository.save(role);
+        Role savedRole = roleRepository.save(role);
 
-        return toResponse(role);
+        auditLogService.log(
+                "ROLE_PERMISSION_REMOVED",
+                "ROLE",
+                savedRole.getId(),
+                "Permission " + permission.getName()
+                        + " removed from role " + savedRole.getName(),
+                httpRequest
+        );
+
+        return toResponse(savedRole);
     }
 
     private Role findRole(UUID id) {
